@@ -1,19 +1,27 @@
 
 <form [formGroup]="secretForm" autocomplete="off">
 
-<div class="row my-3">
-  <div class="col-1 offset-1">
-    <button class="btn btn-outline-secondary" (click)="toggleMode()">{{isEncryptMode() ? "encrypt" : "decrypt"}}</button>
+<div class="row my-3 justify-content-center">
+  <div class="col-lg-5 mt-3">
+    <!-- <button class="btn btn-outline-secondary" (click)="toggleMode()">{{isEncryptMode() ? "encrypt" : "decrypt"}}</button> -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <button class="nav-link" [class]="isEncryptMode() ? 'active' : ''" (click)="setEncrypt()">Encrypt 📝 → 😃</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class]="isDecryptMode() ? 'active' : ''" (click)="setDecrypt()">Decrypt 😃 → 📝</button>
+      </li>
+    </ul>
   </div>
-  <div class="col-4 offset-5">
+  <div class="col-lg-5 mt-3">
     <div class="form-group row">
-      <label for="secret" class="col-sm-2 col-form-label text-right">Secret</label>
+      <label for="secret" class="col-sm-2 col-form-label text-right">Secret 🤐</label>
       <div class="col-sm-10">
         <input formControlName="secret" type="text" class="form-control" id="secret" placeholder="Optional" name="secret">
       </div>
     </div>
     <div class="d-flex justify-content-end mt-1">
-      <small class="text-muted">Use a secure secret.</small>
+      <small class="text-muted">To decrypt a message, one must know the same secret used to encrypt it.</small>
     </div>
   </div>
 </div>
@@ -23,14 +31,14 @@
   <div class="row convert-row justify-content-center my-3" [class]="isEncryptMode() ? 'flex-row' : 'flex-row-reverse' ">
     <div class="col-5">
       <form [formGroup]="plainTextForm" autocomplete="off">
-        <h3>Message</h3>
+        <h3>Message 📝</h3>
         <textarea formControlName="plainText" class="convert-text w-100" name="field1" [readonly]="isDecryptMode()"></textarea>
       </form>
     </div>
 
     <div class="col-5">
       <form [formGroup]="emojiTextForm" autocomplete="off">
-        <h3>Emoji Cipher</h3>
+        <h3>Emoji Cipher 😃</h3>
         <textarea formControlName="emojiText" class="convert-text w-100" name="field2" [readonly]="isEncryptMode()"></textarea>
       </form>
     </div>

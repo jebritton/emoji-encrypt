@@ -3,6 +3,7 @@ import { Form, FormBuilder, FormControl, FormGroup, NgForm, ReactiveFormsModule 
 import { filter, from, Observable, Subject, tap } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 import * as emoji from 'node-emoji';
+// import * as niceware from 'niceware';
 
 @Component({
   selector: 'app-converter',
@@ -146,6 +147,14 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   toggleMode() {
     this.mode = this.isEncryptMode() ? Mode.decrypt : Mode.encrypt;
+  }
+
+  setEncrypt() {
+    this.mode = Mode.encrypt;
+  }
+
+  setDecrypt() {
+    this.mode = Mode.decrypt;
   }
 
   cipherToEncoded(cipherText: string): string[] {
