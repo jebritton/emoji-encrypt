@@ -6,10 +6,10 @@
     <!-- <button class="btn btn-outline-secondary" (click)="toggleMode()">{{isEncryptMode() ? "encrypt" : "decrypt"}}</button> -->
     <ul class="nav nav-tabs">
       <li class="nav-item">
-        <button class="nav-link" [class]="isEncryptMode() ? 'active' : ''" (click)="setEncrypt()">Encrypt 📝 → 😃</button>
+        <button class="nav-link" [class]="isEncryptMode() ? 'active' : ''" (click)="setEncrypt()">Encrypt 📝 → 🔐</button>
       </li>
       <li class="nav-item">
-        <button class="nav-link" [class]="isDecryptMode() ? 'active' : ''" (click)="setDecrypt()">Decrypt 😃 → 📝</button>
+        <button class="nav-link" [class]="isDecryptMode() ? 'active' : ''" (click)="setDecrypt()">Decrypt 🔐 → 📝</button>
       </li>
     </ul>
   </div>
@@ -31,15 +31,15 @@
   <div class="row convert-row justify-content-center my-3" [class]="isEncryptMode() ? 'flex-row' : 'flex-row-reverse' ">
     <div class="col-5">
       <form [formGroup]="plainTextForm" autocomplete="off">
-        <h3>Message 📝</h3>
-        <textarea formControlName="plainText" class="convert-text w-100" name="field1" [readonly]="isDecryptMode()"></textarea>
+        <h3 class="text-label">Message 📝</h3>
+        <textarea formControlName="plainText" class="convert-text w-100" name="plainText" [readonly]="isDecryptMode()"></textarea>
       </form>
     </div>
 
     <div class="col-5">
       <form [formGroup]="emojiTextForm" autocomplete="off">
-        <h3>Encrypted 😃</h3>
-        <textarea formControlName="emojiText" class="convert-text w-100" name="field2" [readonly]="isEncryptMode()"></textarea>
+        <h3 class="text-label">Encrypted 🔐</h3>
+        <textarea formControlName="emojiText" class="convert-text w-100" name="emojiText" [readonly]="isEncryptMode()"></textarea>
       </form>
     </div>
   </div>
