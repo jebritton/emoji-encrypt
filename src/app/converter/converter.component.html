@@ -64,7 +64,6 @@
         <textarea formControlName="plainText" class="form-control convert-text w-100" name="plainText" [readonly]="isDecryptMode()"
           [ngClass]="{ 'is-invalid': (isInvalidInput && isDecryptMode()), 'is-valid': (decodedSuccess && isDecryptMode()) }" ></textarea>
         <div *ngIf="(isInvalidInput && isDecryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
-        <a *ngIf="isEncryptMode()" type="button" class="float-start card-link" (click)="update()">refresh</a>
         <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="clearPlainText()"> clear</a>
       </form>
     </div>
@@ -84,6 +83,7 @@
           [class]="(isInvalidInput && isEncryptMode()) ? 'is-invalid' : ''"></textarea>
         <div *ngIf="(isInvalidInput && isEncryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
         <a *ngIf="isDecryptMode()" type="button" class="float-end card-link" (click)="clearEmojiText()">clear</a>
+        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="update()">refresh</a>
       </form>
     </div>
   </div>
