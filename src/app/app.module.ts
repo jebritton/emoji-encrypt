@@ -7,6 +7,9 @@ import { AppComponent } from './app.component';
 
 import { ConverterComponent } from './converter/converter.component';
 
+import { ClipboardModule } from '@angular/cdk/clipboard';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,6 +20,8 @@ import { ConverterComponent } from './converter/converter.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    ClipboardModule,
+    FontAwesomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,27 +1,48 @@
-
 <form [formGroup]="secretForm" autocomplete="off">
-
+  
 <div class="row my-3 justify-content-center">
-  <div class="col-lg-5 mt-3">
-    <!-- <button class="btn btn-outline-secondary" (click)="toggleMode()">{{isEncryptMode() ? "encrypt" : "decrypt"}}</button> -->
-    <ul class="nav nav-tabs">
+  <div class="col-lg-5 mt-3 d-flex justify-content-center justify-content-lg-start">
+    <div>
+      <button class="btn btn-outline-secondary important-text" [class]="isEncryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
+        Encrypt <fa-icon [icon]="faLock"></fa-icon>
+      </button>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary mx-2 important-text" [class]="isDecryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
+        Decrypt <fa-icon [icon]="faUnlock"></fa-icon>
+      </button>
+    </div>
+    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" [checked]="isEncryptMode()" (change)="toggleMode()">
+      <label class="btn btn-outline-primary" for="btnradio1">Encrypt 📝 → 🔐</label>
+      <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" [checked]="isDecryptMode()" (change)="toggleMode()">
+      <label class="btn btn-outline-primary" for="btnradio2">Decrypt 🔐 → 📝</label>
+    </div> -->
+    <!-- <ul class="nav nav-tabs">
       <li class="nav-item">
         <button class="nav-link" [class]="isEncryptMode() ? 'active' : ''" (click)="setEncrypt()">Encrypt 📝 → 🔐</button>
       </li>
       <li class="nav-item">
         <button class="nav-link" [class]="isDecryptMode() ? 'active' : ''" (click)="setDecrypt()">Decrypt 🔐 → 📝</button>
       </li>
-    </ul>
+    </ul> -->
   </div>
   <div class="col-lg-5 mt-3">
     <div class="form-group row">
-      <label for="secret" class="col-sm-2 col-form-label text-right">Secret 🤐</label>
-      <div class="col-sm-10">
-        <input formControlName="secret" type="text" class="form-control" id="secret" placeholder="Optional" name="secret">
+      <label for="secret" class="col-lg-2 col-form-label text-lg-end text-lg important-text pb-1 secret me-0 pe-0">Secret <fa-icon [icon]="faKey"></fa-icon></label>
+      <div class="col-lg-10">
+        <div class="input-group">
+          <input formControlName="secret" [type]="showSecret ? 'text': 'password'" class="form-control py-3 px-3" id="secret" placeholder="optional" name="secret">
+          <div class="input-group-append">
+            <button class="btn btn-primary input-button px-3" type="button" (click)="toggleShowSecret()">
+              <fa-icon [icon]="showSecret ? faEyeSlash : faEye"></fa-icon>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="d-flex justify-content-end mt-1">
-      <small class="text-muted">To decrypt a message, one must know the same secret used to encrypt it.</small>
+    <div class="d-flex justify-content-center  justify-content-lg-end mt-1">
+      <small class="">Decrypting a message requires having the secret used to encrypt it.</small>
     </div>
   </div>
 </div>
@@ -29,17 +50,40 @@
 </form>
 
   <div class="row convert-row justify-content-center my-3" [class]="isEncryptMode() ? 'flex-row' : 'flex-row-reverse' ">
-    <div class="col-5">
+    <div class="col-lg-5 col-6">
       <form [formGroup]="plainTextForm" autocomplete="off">
-        <h3 class="text-label">Message 📝</h3>
-        <textarea formControlName="plainText" class="convert-text w-100" name="plainText" [readonly]="isDecryptMode()"></textarea>
+        <div class="d-flex justify-content-between">
+          <h3 class="text-label">Message <fa-icon [icon]="faEnvelopeOpenText"></fa-icon></h3>
+          <div class="d-flex align-items-center h-100">
+            <div *ngIf="plainCopied" class="important-text" style="margin-right: 0.4em;">Copied!</div>
+            <a type="button" class=" p-1 rounded mb-1" (click)="copyText('plainText')">
+              <h4 class="m-0 p-0"><fa-icon [icon]="plainCopied ? faCopySolid : faCopy"></fa-icon></h4>
+            </a>
+          </div>
+        </div>
+        <textarea formControlName="plainText" class="form-control convert-text w-100" name="plainText" [readonly]="isDecryptMode()"
+          [ngClass]="{ 'is-invalid': (isInvalidInput && isDecryptMode()), 'is-valid': (decodedSuccess && isDecryptMode()) }" ></textarea>
+        <div *ngIf="(isInvalidInput && isDecryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
+        <a *ngIf="isEncryptMode()" type="button" class="float-start card-link" (click)="update()">refresh</a>
+        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="clearPlainText()"> clear</a>
       </form>
     </div>
 
-    <div class="col-5">
+    <div class="col-lg-5 col-6">
       <form [formGroup]="emojiTextForm" autocomplete="off">
-        <h3 class="text-label">Encrypted 🔐</h3>
-        <textarea formControlName="emojiText" class="convert-text w-100" name="emojiText" [readonly]="isEncryptMode()"></textarea>
+        <div class="d-flex justify-content-between">
+          <h3 class="text-label">Encrypted <fa-icon [icon]="faIcons"></fa-icon></h3>
+          <div class="d-flex align-items-center h-100">
+            <div *ngIf="emojiCopied" class="important-text" style="margin-right: 0.4em;">Copied!</div>
+            <a type="button" class=" p-1 rounded mb-1" (click)="copyText('emojiText')">
+              <h4 class="m-0 p-0"><fa-icon [icon]="emojiCopied ? faCopySolid : faCopy"></fa-icon></h4>
+            </a>
+          </div>
+        </div>
+        <textarea formControlName="emojiText" class="form-control convert-text w-100" name="emojiText" [readonly]="isEncryptMode()"
+          [class]="(isInvalidInput && isEncryptMode()) ? 'is-invalid' : ''"></textarea>
+        <div *ngIf="(isInvalidInput && isEncryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
+        <a *ngIf="isDecryptMode()" type="button" class="float-end card-link" (click)="clearEmojiText()">clear</a>
       </form>
     </div>
   </div>
