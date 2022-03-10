@@ -26,3 +26,17 @@
 .secret {
   white-space: nowrap;
 }
+
+.plain-button, .plain-button:active, .plain-button:active:focus, .plain-button:focus, .plain-button:hover  {
+  border: 0;
+  background: none;
+  box-shadow: none;
+  transition: none;
+  color: inherit;
+}
+
+.disabled-link {
+  cursor: default;
+  pointer-events: none;
+  opacity: .65;
+}

@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="d-flex justify-content-center  justify-content-lg-end mt-1">
-      <small class="">Decrypting a message requires having the secret used to encrypt it.</small>
+      <small class="">Decrypting a message requires the secret used to encrypt it.</small>
     </div>
   </div>
 </div>
@@ -55,16 +55,18 @@
         <div class="d-flex justify-content-between">
           <h3 class="text-label">Message <fa-icon [icon]="faEnvelopeOpenText"></fa-icon></h3>
           <div class="d-flex align-items-center h-100">
-            <div *ngIf="plainCopied" class="important-text" style="margin-right: 0.4em;">Copied!</div>
-            <a type="button" class=" p-1 rounded mb-1" (click)="copyText('plainText')">
+            <button type="button" class="btn p-1 rounded mb-1 plain-button" (click)="copyText('plain')" [tooltip]="copyPlainTooltip"
+              [disabled]="!hasPlainText()">
+              <ng-template #copyPlainTooltip>{{plainCopied ? 'Copied' : 'Copy'}}</ng-template>
               <h4 class="m-0 p-0"><fa-icon [icon]="plainCopied ? faCopySolid : faCopy"></fa-icon></h4>
-            </a>
+            </button>
           </div>
         </div>
         <textarea formControlName="plainText" class="form-control convert-text w-100" name="plainText" [readonly]="isDecryptMode()"
           [ngClass]="{ 'is-invalid': (isInvalidInput && isDecryptMode()), 'is-valid': (decodedSuccess && isDecryptMode()) }" ></textarea>
         <div *ngIf="(isInvalidInput && isDecryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
-        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="clearPlainText()"> clear</a>
+        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="clearPlainText()"
+          [class]="!hasPlainText() ? 'disabled-link' : ''">clear</a>
       </form>
     </div>
 
@@ -73,17 +75,20 @@
         <div class="d-flex justify-content-between">
           <h3 class="text-label">Encrypted <fa-icon [icon]="faIcons"></fa-icon></h3>
           <div class="d-flex align-items-center h-100">
-            <div *ngIf="emojiCopied" class="important-text" style="margin-right: 0.4em;">Copied!</div>
-            <a type="button" class=" p-1 rounded mb-1" (click)="copyText('emojiText')">
-              <h4 class="m-0 p-0"><fa-icon [icon]="emojiCopied ? faCopySolid : faCopy"></fa-icon></h4>
-            </a>
+            <button type="button" class="btn plain-button p-1 rounded mb-1" (click)="copyText('emoji')"
+              [disabled]="!hasEmojiText()">
+              <ng-template #copyEmojiTooltip>{{emojiCopied ? 'Copied' : 'Copy'}}</ng-template>
+              <h4 class="m-0 p-0"><fa-icon [icon]="emojiCopied ? faCopySolid : faCopy" [tooltip]="copyEmojiTooltip"></fa-icon></h4>
+            </button>
           </div>
         </div>
         <textarea formControlName="emojiText" class="form-control convert-text w-100" name="emojiText" [readonly]="isEncryptMode()"
           [class]="(isInvalidInput && isEncryptMode()) ? 'is-invalid' : ''"></textarea>
         <div *ngIf="(isInvalidInput && isEncryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
-        <a *ngIf="isDecryptMode()" type="button" class="float-end card-link" (click)="clearEmojiText()">clear</a>
-        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link" (click)="update()">refresh</a>
+        <a *ngIf="isDecryptMode()" type="button" class="float-end card-link" (click)="clearEmojiText()"
+          [class]="!hasEmojiText() ? 'disabled-link' : ''">clear</a>
+        <a *ngIf="isEncryptMode()" type="button" class="float-end card-link important-text" (click)="update()"
+          [class]="!hasPlainText() ? 'disabled-link' : ''">refresh</a>
       </form>
     </div>
   </div>

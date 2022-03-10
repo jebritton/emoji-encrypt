@@ -3,7 +3,6 @@ import { Form, FormBuilder, FormControl, FormGroup, NgForm, ReactiveFormsModule 
 import { filter, from, Observable, Subject, tap } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 import * as emoji from 'node-emoji';
-// import * as niceware from 'niceware';
 import { Clipboard } from '@angular/cdk/clipboard'
 import { faEraser, faIcons, faKeyboard, faKey, faLock, faUnlock, faCopy as faCopySolid, faEnvelopeOpenText } from '@fortawesome/free-solid-svg-icons';
 import { faCopy, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
@@ -24,7 +23,6 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   plainText: string = "";
   emojiText: string = "";
 
-  emojiArray: string[];
   emojiWords: string[];
   emojiIndexMap: Map<string, number> = new Map<string, number>();
 
@@ -33,8 +31,10 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   invalidMessage: string = "";
 
   showSecret: boolean = true;
+  plainCopied: boolean = false;
+  emojiCopied: boolean = false;
 
-  // icons
+  // Font Awesome icons for UI
   faCopy = faCopy;
   faCopySolid = faCopySolid;
   faEye = faEye;
@@ -47,31 +47,18 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   faEnvelopeOpenText = faEnvelopeOpenText;
   faEraser = faEraser;
 
-  plainCopied = false;
-  emojiCopied = false;
-
   constructor(
     private clipboard: Clipboard
   ) {
     // create 3 forms to monitor separately
-    this.secretForm = new FormGroup({
-      secret: new FormControl()
-    });
-    this.plainTextForm = new FormGroup({
-      plainText: new FormControl()
-    });
-    this.emojiTextForm = new FormGroup({
-      emojiText: new FormControl()
-    });
-    // create Emoji array and map
-    // this.emojiArray = EMOJIS.sort().slice(0, 36); // 36 distinct characters
-    this.emojiArray = EMOJIS.slice(0, 36); // 36 distinct characters
-    const emojiStr = this.emojiArray.join("");
+    this.secretForm = new FormGroup({ secret: new FormControl() });
+    this.plainTextForm = new FormGroup({ plainText: new FormControl() });
+    this.emojiTextForm = new FormGroup({ emojiText: new FormControl() });
+
+    // create Emoji words array and map
+    const emojiStr = EMOJIS.join("");
     this.emojiWords = this.makeEmojiWords(emojiStr);
-    for (let i = 0; i < this.emojiWords.length; i++) {
-      this.emojiIndexMap.set(this.emojiWords[i], i);
-    }
-    const s = ":"+this.emojiWords.join("::")+":"
+    this.emojiWords.forEach((word, index) => this.emojiIndexMap.set(word, index) );
   }
 
   ngOnInit(): void {
@@ -82,7 +69,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     this.secretForm.valueChanges.pipe(
       tap(form => this.secret = form['secret'].trim())
     ).subscribe(
-      (form: any) => {
+      (_form: any) => {
         this.update();
       }
     )
@@ -90,7 +77,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
       filter(f => this.isEncryptMode()),
       tap(form => this.plainText = form['plainText']),
     ).subscribe(
-      (form: any) => {
+      (_form: any) => {
         this.encrypt();
       }
     );
@@ -98,7 +85,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
       filter(f => this.isDecryptMode()),
       tap(form => this.emojiText = form['emojiText']),
     ).subscribe(
-      (form: any) => {
+      (_form: any) => {
         this.decrypt();
       }
     );
@@ -106,41 +93,35 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   encrypt() {
     this.resetInvalid();
-    if (this.plainText.length > 0) {
+    this.emojiText = "";
+    if (this.hasPlainText()) {
       try {
         this.emojiText = this.plainTextToEmoji(this.plainText);
       } catch {
-        this.emojiText = "";
         this.isInvalidInput = true;
-        this.invalidMessage = "This message could not be encrypted.";
+        this.invalidMessage = "Error while encrypting this message";
       }
-    } else {
-      this.emojiText = "";
     }
     this.emojiTextForm.controls['emojiText']?.setValue(this.emojiText);
   }
 
   decrypt() {
     this.resetInvalid();
-    if (this.emojiText.length > 0) {
+    this.plainText = "";
+    if (this.hasEmojiText()) {
       try {
         this.plainText = this.emojiToPlainText(this.emojiText);
       } catch {
-        this.plainText = "";
         this.isInvalidInput = true;
-        this.invalidMessage = "Invalid emoji cipher.";
+        this.invalidMessage = "Invalid emoji cipher or secret";
       }
-    } else {
-      this.plainText = "";
     }
     this.plainTextForm.controls['plainText']?.setValue(this.plainText);
   }
 
   plainTextToEmoji(plainText: string) {
     let cipherStr = this.encryptPlainText(plainText);
-    console.log(cipherStr)
-    cipherStr = cipherStr.substring(10); // remove "Salted__"
-    console.log(cipherStr)
+    cipherStr = cipherStr.substring(10); // remove encoded prefix "Salted__"
     const baseEncoded = this.cipherToEncoded(cipherStr);
     let cipherEmoji = "";
     baseEncoded.forEach((code: string) => {
@@ -160,9 +141,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
       baseEncoded.push(char1 + char2)
     }
     let cipherStr = this.encodedToCipher(baseEncoded);
-    console.log(cipherStr)
     cipherStr = btoa("Salted__").slice(0, 10) + cipherStr
-    console.log(cipherStr)
     const decrypted = this.decryptCipherText(cipherStr);
     return decrypted;
   }  
@@ -176,7 +155,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     const decryptedStr = decryptData.toString(CryptoJS.enc.Utf8);
     if (decryptedStr.length == 0) {
       this.isInvalidInput = true;
-      this.invalidMessage = "Invalid emoji cipher."
+      this.invalidMessage = "Invalid emoji cipher or secret"
       return "";
     }
     this.decodedSuccess = true;
@@ -193,7 +172,6 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   toggleMode() {
     this.mode = this.isEncryptMode() ? Mode.decrypt : Mode.encrypt;
-    // this.resetInvalid();
     this.update();
   }
 
@@ -233,10 +211,6 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     return this.emojiIndexMap.get(emojiWord) ?? 0;
   }
 
-  // indexToEmoji(index: number): string {
-  //   return this.emojiArray[index] ?? "";
-  // }
-
   indexToEmoji(index: number): string {
     return emoji.get(this.emojiWords[index] ?? "not found");
   }
@@ -244,7 +218,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   makeEmojiWords(emojiText: string): string[] {
     const unemoji = emoji.unemojify(emojiText);
     let emojiWords = emoji.emojify(unemoji, undefined, format).split(',');
-    if (emojiWords[emojiWords.length - 1].length == 0)
+    if (emojiWords[emojiWords.length - 1].length == 0) // nothing after last comma
       emojiWords.pop()
     return emojiWords;
   }
@@ -267,7 +241,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   }
 
   copyText(field: string) {
-    const toCopy = field == 'plainText' ? this.plainText : this.emojiText;
+    const toCopy = field == 'plain' ? this.plainText : this.emojiText;
     if (toCopy.length == 0)
       return;
     const pending = this.clipboard.beginCopy(toCopy);
@@ -277,7 +251,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
       if (!result && --remainingAttempts) {
         setTimeout(attempt);
       } else {
-        if (field == 'plainText') {
+        if (field == 'plain') {
           this.plainCopied = true;
           setTimeout(() => this.plainCopied = false, 1500)
         } else {
@@ -298,10 +272,18 @@ export class ConverterComponent implements OnInit, AfterViewInit {
     this.emojiTextForm.controls['emojiText']?.setValue("");
   }
 
+  hasEmojiText(): boolean {
+    return this.emojiText.length > 0;
+  }
+
+  hasPlainText(): boolean {
+    return this.plainText.length > 0;
+  }
+
 }
 
-// emoji format
-let format = function (code: string, name: string) {
+// emojify custom format function to create string of names to split
+let format = function (_code: string, name: string) {
   return name+',';
 }
 
@@ -310,10 +292,13 @@ export enum Mode {
   decrypt
 }
 
+// NOTE: This order cannot change now that users have started generating encrypted
+// messages. If something with this emoji list or the encoding method changes, it will
+// need to be versioned somehow to not break existing messages.
 export const EMOJIS = [
-  "🐖", // not common (0)
-  "❤️", //  common (1), which appears a lot in base 36
-  "🥺", // common
+  "🐖", 
+  "❤️", 
+  "🥺", 
   "🍯",
   "🌿",
   "👫",
@@ -346,15 +331,5 @@ export const EMOJIS = [
   "🌼",
   "🍄",
   "💛",
-  "🐷", // index 35, the 36th element
-  // "👩🏽‍🤝‍👨🏼",
-  // "👩🏽‍🌾",
-  // "🤟🏽",
-  // "🖤",
-  // "🧡",
-  // "💚",
-  // "💜",
-  // "🤎",
-  // "💙",
-  // "👼🏽",
+  "🐷", // index 35
 ]
