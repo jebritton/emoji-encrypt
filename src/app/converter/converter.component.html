@@ -55,8 +55,8 @@
         <div class="d-flex justify-content-between">
           <h3 class="text-label">Message <fa-icon [icon]="faEnvelopeOpenText"></fa-icon></h3>
           <div class="d-flex align-items-center h-100">
-            <button type="button" class="btn p-1 rounded mb-1 plain-button" (click)="copyText('plain')" [tooltip]="copyPlainTooltip"
-              [disabled]="!hasPlainText()">
+            <button type="button" class="btn p-1 rounded mb-1 plain-button" (click)="copyText('plain')" 
+              [disabled]="!hasPlainText()" id="plain-copy" [tooltip]="copyPlainTooltip" #plaincopy="bs-tooltip">
               <ng-template #copyPlainTooltip>{{plainCopied ? 'Copied' : 'Copy'}}</ng-template>
               <h4 class="m-0 p-0"><fa-icon [icon]="plainCopied ? faCopySolid : faCopy"></fa-icon></h4>
             </button>
@@ -76,9 +76,9 @@
           <h3 class="text-label">Encrypted <fa-icon [icon]="faIcons"></fa-icon></h3>
           <div class="d-flex align-items-center h-100">
             <button type="button" class="btn plain-button p-1 rounded mb-1" (click)="copyText('emoji')"
-              [disabled]="!hasEmojiText()">
+              [disabled]="!hasEmojiText()"  id="emoji-copy" [tooltip]="copyEmojiTooltip" #emojicopy="bs-tooltip">
               <ng-template #copyEmojiTooltip>{{emojiCopied ? 'Copied' : 'Copy'}}</ng-template>
-              <h4 class="m-0 p-0"><fa-icon [icon]="emojiCopied ? faCopySolid : faCopy" [tooltip]="copyEmojiTooltip"></fa-icon></h4>
+              <h4 class="m-0 p-0"><fa-icon [icon]="emojiCopied ? faCopySolid : faCopy"></fa-icon></h4>
             </button>
           </div>
         </div>

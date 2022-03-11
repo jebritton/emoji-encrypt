@@ -6,7 +6,9 @@ import * as emoji from 'node-emoji';
 import { Clipboard } from '@angular/cdk/clipboard'
 import { faEraser, faIcons, faKeyboard, faKey, faLock, faUnlock, faCopy as faCopySolid, faEnvelopeOpenText } from '@fortawesome/free-solid-svg-icons';
 import { faCopy, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
+import { TooltipDirective } from 'ngx-bootstrap/tooltip';
 // import { } from '@fortawesome/free-brands-svg-icons';
+
 
 @Component({
   selector: 'app-converter',
@@ -14,6 +16,9 @@ import { faCopy, faEye, faEyeSlash } from '@fortawesome/free-regular-svg-icons';
   styleUrls: ['./converter.component.scss']
 })
 export class ConverterComponent implements OnInit, AfterViewInit {
+  @ViewChild('plaincopy') plainTooltip!: TooltipDirective
+  @ViewChild('emojicopy') emojiTooltip!: TooltipDirective;
+
   secretForm: FormGroup;
   plainTextForm: FormGroup;
   emojiTextForm: FormGroup;
@@ -253,10 +258,12 @@ export class ConverterComponent implements OnInit, AfterViewInit {
       } else {
         if (field == 'plain') {
           this.plainCopied = true;
-          setTimeout(() => this.plainCopied = false, 1500)
+          setTimeout(() => this.plainTooltip.hide() , 1200);
+          setTimeout(() => this.plainCopied = false, 1500);
         } else {
           this.emojiCopied = true;
-          setTimeout(() => this.emojiCopied = false, 1500)
+          setTimeout(() => this.emojiTooltip.hide() , 1200);
+          setTimeout(() => this.emojiCopied = false, 1500);
         }
         pending.destroy();
       }
