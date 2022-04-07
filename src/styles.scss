@@ -1,9 +1,37 @@
-/* You can add global styles to this file, and also import other style files */
 
-/* Importing Bootstrap SCSS file. */
+// Morph Bootswatch Theme Colors and Overrides
+$white:    #fff;
+$gray-100: #f0f5fa;
+$gray-200: #E1ECE5; // customized
+$gray-300: #dee2e6;
+$gray-400: #bed1e6;
+$gray-500: #adb5bd;
+$gray-600: #7f8a99;
+$gray-700: #7b8ab8;
+$gray-800: #444b40;
+$gray-900: #212529;
+$black:    #000;
 
-@import "../node_modules/bootstrap/scss/functions";
-@import "../node_modules/bootstrap/scss/variables";
+$blue:    #378dfc;
+$indigo:  #6610f2;
+$purple:  #5b62f4;
+$pink:    #d63384;
+$red:     #e52527;
+$orange:  #fd7e14;
+$yellow:  #ffc107;
+$green:   #43cc29;
+$teal:    #20c997;
+$cyan:    #0dcaf0;
 
-// @import "../node_modules/bootstrap/scss/bootstrap";
-@import "../node_modules/bootswatch/dist/morph/bootstrap.min.css";
+$primary:       $blue;
+$secondary:     $gray-200;
+$success:       $green;
+$info:          $purple;
+$warning:       $yellow;
+$danger:        $red;
+$light:         $gray-100;
+$dark:          $gray-900;
+
+@import "../node_modules/bootswatch/dist/morph/variables";
+@import "../node_modules/bootstrap/scss/bootstrap";
+@import "../node_modules/bootswatch/dist/morph/bootswatch";

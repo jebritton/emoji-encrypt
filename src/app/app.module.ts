@@ -10,11 +10,13 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
+import { AboutComponent } from './about/about.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ConverterComponent
+    ConverterComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,
