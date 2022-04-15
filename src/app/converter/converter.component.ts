@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild, } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild, } from '@angular/core';
 import { Form, FormBuilder, FormControl, FormGroup, NgForm, ReactiveFormsModule } from '@angular/forms';
 import { filter, from, Observable, Subject, tap } from 'rxjs';
 import * as CryptoJS from 'crypto-js';
@@ -16,9 +16,10 @@ import { TooltipDirective } from 'ngx-bootstrap/tooltip';
   styleUrls: ['./converter.component.scss']
 })
 export class ConverterComponent implements OnInit, AfterViewInit {
+  @ViewChild('emojiTextarea') emojiTextarea!: ElementRef<HTMLElement>;
   @ViewChild('plaincopy') plainTooltip!: TooltipDirective
   @ViewChild('emojicopy') emojiTooltip!: TooltipDirective;
-
+  innerWidth: number = 1920;
   secretForm: FormGroup;
   plainTextForm: FormGroup;
   emojiTextForm: FormGroup;
@@ -38,6 +39,11 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   showSecret: boolean = true;
   plainCopied: boolean = false;
   emojiCopied: boolean = false;
+
+  // keep track so size not back and forth
+  prevPlaintextLength?: number = undefined;
+  // prevEmojiTextLength: number = 0;
+  prevEmojiTextSize?: number = undefined;
 
   // Font Awesome icons for UI
   faCopy = faCopy;
@@ -67,7 +73,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-
+    this.innerWidth = window.innerWidth;
   }
 
   ngAfterViewInit(): void {
@@ -177,6 +183,7 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   toggleMode() {
     this.mode = this.isEncryptMode() ? Mode.decrypt : Mode.encrypt;
+    this.resetFontState();
     this.update();
   }
 
@@ -273,10 +280,12 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   clearPlainText() {
     this.plainTextForm.controls['plainText']?.setValue("");
+    this.resetFontState();
   }
 
   clearEmojiText() {
     this.emojiTextForm.controls['emojiText']?.setValue("");
+    this.resetFontState();
   }
 
   hasEmojiText(): boolean {
@@ -285,6 +294,76 @@ export class ConverterComponent implements OnInit, AfterViewInit {
 
   hasPlainText(): boolean {
     return this.plainText.length > 0;
+  }
+
+  emojiTextFontSize(): string {
+    let newOptimal =  this.optimalFontSize();
+    let size = newOptimal;
+    if (this.prevPlaintextLength && this.prevEmojiTextSize) {
+      if (this.plainText.length > this.prevPlaintextLength && newOptimal < this.prevEmojiTextSize)
+        size = newOptimal;
+      else if (this.plainText.length < this.prevPlaintextLength && newOptimal > this.prevEmojiTextSize)
+        size = newOptimal;
+      else 
+        size = this.prevEmojiTextSize;
+    }
+    this.prevPlaintextLength = this.plainText.length;
+    this.prevEmojiTextSize = size;
+    return size + "px !important";
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    console.log(event.target.innerWidth);
+    this.innerWidth = window.innerWidth;
+    this.resetFontState();
+  }
+
+  // TODO: improve this first iteration
+  optimalFontSize(): number {
+    let xPadding = this.innerWidth < 720 ? 12 : 24;
+    let x = (this.emojiTextarea?.nativeElement?.clientWidth ?? 500) - 2 * xPadding + 10;
+    let y = Math.floor(((this.emojiTextarea?.nativeElement?.clientHeight ?? 300) - 2 * 16) * 2.3 + 10);
+    console.log(x,y)
+    let n = this.emojiText.length;
+    // https://stackoverflow.com/questions/12627449/pack-squares-into-a-rectangle
+    
+    // let numItems = n; // the number of squares we need to pack in.
+    // let rectWidth = x; // the width of the space into which we want to pack our squares.
+    // let rectHeight = y; // the height of the space into which we want to pack our squares.
+
+    // let tableRatio = rectWidth / rectHeight;
+    // let columns = Math.sqrt(numItems * tableRatio);
+    // let rows = columns / tableRatio;
+
+    // columns = Math.ceil(columns); // the number of columns of squares we will have
+    // rows = Math.ceil(rows); // the number of rows of squares we will have
+
+    // let squareSize = rectWidth / columns; // the size of each square.
+    // return squareSize;
+
+    // // https://math.stackexchange.com/questions/466198/algorithm-to-get-the-maximum-size-of-n-squares-that-fit-into-a-rectangle-with-a
+    let sx, sy;
+
+    let px = Math.ceil(Math.sqrt(n * x / y));
+    if (Math.floor(px * y / x) * px < n) {
+        sx = y / Math.ceil(px * y / x);
+    } else {
+        sx = x / px;
+    }
+
+    let py = Math.ceil(Math.sqrt(n * y / x));
+    if (Math.floor(py * x / y) * py < n) {
+        sy = x / Math.ceil(x * py / y);
+    } else {
+        sy = y / py;
+    }
+    return Math.max(sx, sy);
+  }
+
+  resetFontState() {
+    this.prevPlaintextLength = undefined;
+    this.prevEmojiTextSize = undefined;
   }
 
 }

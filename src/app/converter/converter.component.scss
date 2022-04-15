@@ -40,3 +40,18 @@
   pointer-events: none;
   opacity: .65;
 }
+
+#emojiTextarea {
+  line-height: 100%;
+  font-family: 'Roboto Mono', monospace;
+  letter-spacing: normal;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@media (max-width: 720px) {
+  #emojiTextarea {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}

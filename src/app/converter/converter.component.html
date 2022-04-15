@@ -1,55 +1,41 @@
+<!-- Top Row Elements -->
 <form [formGroup]="secretForm" autocomplete="off">
-  
-<div class="row my-3 justify-content-center">
-  <div class="col-lg-5 mt-3 d-flex justify-content-center justify-content-lg-start">
-    <div>
-      <button class="btn btn-outline-secondary important-text" [class]="isEncryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
-        Encrypt <fa-icon [icon]="faLock"></fa-icon>
-      </button>
+  <div class="row my-3 justify-content-center">
+    <div class="col-lg-5 mt-3 d-flex justify-content-center justify-content-lg-start">
+      <div>
+        <button class="btn btn-outline-secondary important-text" [class]="isEncryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
+          Encrypt <fa-icon [icon]="faLock"></fa-icon>
+        </button>
+      </div>
+      <div>
+        <button class="btn btn-outline-secondary mx-2 important-text" [class]="isDecryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
+          Decrypt <fa-icon [icon]="faUnlock"></fa-icon>
+        </button>
+      </div>
     </div>
-    <div>
-      <button class="btn btn-outline-secondary mx-2 important-text" [class]="isDecryptMode() ? 'disabled' : ''" (click)="toggleMode()" type="button">
-        Decrypt <fa-icon [icon]="faUnlock"></fa-icon>
-      </button>
-    </div>
-    <!-- <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" [checked]="isEncryptMode()" (change)="toggleMode()">
-      <label class="btn btn-outline-primary" for="btnradio1">Encrypt 📝 → 🔐</label>
-      <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" [checked]="isDecryptMode()" (change)="toggleMode()">
-      <label class="btn btn-outline-primary" for="btnradio2">Decrypt 🔐 → 📝</label>
-    </div> -->
-    <!-- <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <button class="nav-link" [class]="isEncryptMode() ? 'active' : ''" (click)="setEncrypt()">Encrypt 📝 → 🔐</button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" [class]="isDecryptMode() ? 'active' : ''" (click)="setDecrypt()">Decrypt 🔐 → 📝</button>
-      </li>
-    </ul> -->
-  </div>
-  <div class="col-lg-5 mt-3">
-    <div class="form-group row">
-      <label for="secret" class="col-lg-2 col-form-label text-lg-end text-lg important-text pb-1 secret me-0 pe-0">Secret <fa-icon [icon]="faKey"></fa-icon></label>
-      <div class="col-lg-10">
-        <div class="input-group">
-          <input formControlName="secret" [type]="showSecret ? 'text': 'password'" class="form-control py-3 px-3" id="secret" placeholder="optional" name="secret">
-          <div class="input-group-append">
-            <button class="btn btn-primary input-button px-3" type="button" (click)="toggleShowSecret()">
-              <fa-icon [icon]="showSecret ? faEyeSlash : faEye"></fa-icon>
-            </button>
+    <div class="col-lg-5 mt-3">
+      <div class="form-group row">
+        <label for="secret" class="col-lg-2 col-form-label text-lg-end text-lg important-text pb-1 secret me-0 pe-0">Secret <fa-icon [icon]="faKey"></fa-icon></label>
+        <div class="col-lg-10">
+          <div class="input-group">
+            <input formControlName="secret" [type]="showSecret ? 'text': 'password'" class="form-control py-3 px-3" id="secret" placeholder="optional" name="secret">
+            <div class="input-group-append">
+              <button class="btn btn-primary input-button px-3" type="button" (click)="toggleShowSecret()">
+                <fa-icon [icon]="showSecret ? faEyeSlash : faEye"></fa-icon>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="d-flex justify-content-center  justify-content-lg-end mt-1">
-      <small class="">Decrypting a message requires the secret used to encrypt it.</small>
+      <div class="d-flex justify-content-center  justify-content-lg-end mt-1">
+        <small class="">Decrypting a message requires the secret used to encrypt it.</small>
+      </div>
     </div>
   </div>
-</div>
-
 </form>
 
   <div class="row convert-row justify-content-center my-3" [class]="isEncryptMode() ? 'flex-row' : 'flex-row-reverse' ">
+    <!-- Plain Text Message -->
     <div class="col-lg-5 col-6">
       <form [formGroup]="plainTextForm" autocomplete="off">
         <div class="d-flex justify-content-between">
@@ -69,7 +55,7 @@
           [class]="!hasPlainText() ? 'disabled-link' : ''">clear</a>
       </form>
     </div>
-
+    <!-- Emoji Text Cipher -->
     <div class="col-lg-5 col-6">
       <form [formGroup]="emojiTextForm" autocomplete="off">
         <div class="d-flex justify-content-between">
@@ -82,8 +68,9 @@
             </button>
           </div>
         </div>
-        <textarea formControlName="emojiText" class="form-control convert-text w-100" name="emojiText" [readonly]="isEncryptMode()"
-          [class]="(isInvalidInput && isEncryptMode()) ? 'is-invalid' : ''"></textarea>
+        <textarea #emojiTextarea formControlName="emojiText" class="form-control convert-text w-100" name="emojiText" id="emojiTextarea"
+          [readonly]="isEncryptMode()" [class]="(isInvalidInput && isEncryptMode()) ? 'is-invalid' : ''" 
+          [style.font-size]="emojiTextFontSize()"></textarea>
         <div *ngIf="(isInvalidInput && isEncryptMode())" class="invalid-feedback">{{invalidMessage}}</div>
         <a *ngIf="isDecryptMode()" type="button" class="float-end card-link" (click)="clearEmojiText()"
           [class]="!hasEmojiText() ? 'disabled-link' : ''">clear</a>
